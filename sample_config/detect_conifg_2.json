@@ -1,0 +1,8 @@
+{
+  "background-threshold": 21,
+  "min-line-length": 18.0,
+  "max-line-gap": 7.0,
+  "marker-color": "(0, 255, 255, 128)",
+  "marker-thickness": 1,
+  "stack-frames": 5
+}
