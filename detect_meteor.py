@@ -291,7 +291,7 @@ def detect_from_dir_or_video(dir_or_video):
             entry['frame'] = i if timedelta else 0
             entry['creation_time'] = creation_time = image_list.creation_time(i)
             entry['lines'] = lines.tolist()
-            entry['snapshot'] = ss_file = "meteorsnap_" + os.path.basename(path) + (str(timedelta).replace(':', '_') if timedelta else "") + ".png"
+            entry['snapshot'] = ss_file = "meteorsnap_" + os.path.basename(path) + (("_"+str(timedelta).replace(':', '_')) if timedelta else "") + ".png"
             result.append(entry)
             print("detected: {}{}".format(path, (": "+str(timedelta)) if timedelta else ""))
             cimg = cv2.cvtColor(timg, cv2.COLOR_GRAY2RGB)
