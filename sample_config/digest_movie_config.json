@@ -1,5 +1,8 @@
 {
-
+  "margin-before": 1.0,
+  "margin-after": 1.0,
   "marker-color": "(0, 255, 255, 128)",
-  "marker-thickness": 1
+  "marker-thickness": 1,
+  "timestamp-color": "(255, 255, 255, 128)",
+  "timestamp-font-scale": 1.5
 }
