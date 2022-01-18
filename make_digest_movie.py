@@ -183,17 +183,17 @@ def main(argv):
             print("ERROR: " + err.message, file=sys.stderr)
             return -1
     
-    for detection_result_file in args.detection_result_file:
-        make_digest_movie(detection_result_file,
-                          marker_color, args.marker_thickness,
-                          timestamp_color, args.timestamp_font_scale)
-
     if not os.path.exists(args.output_directory) and not args.pipe:
         try:
             os.mkdir(args.output_directory)
         except Exception as err:
             print("ERROR: " + err.message, file=sys.stderr)
             return -1
+
+    for detection_result_file in args.detection_result_file:
+        make_digest_movie(detection_result_file,
+                          marker_color, args.marker_thickness,
+                          timestamp_color, args.timestamp_font_scale)
 
     return 0
 
