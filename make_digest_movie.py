@@ -160,7 +160,10 @@ def main(argv):
     args = parser.parse_args(argv[1:])
 
     if args.config_file:
-        new_args = argutil.merge_config(parser, argv, args.config_file)
+        new_args = argutil.merge_config(parser, argv, args.config_file,
+                                        ('--disable-marker',
+                                         '--disable-timestamp',
+                                         '--pipe'))
         if new_args is not None:
             args = new_args
     

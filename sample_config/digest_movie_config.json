@@ -4,5 +4,8 @@
   "marker-color": "(0, 255, 255, 128)",
   "marker-thickness": 1,
   "timestamp-color": "(255, 255, 255, 128)",
-  "timestamp-font-scale": 1.5
+  "timestamp-font-scale": 1.5,
+  "disable-marker": false,
+  "disable-timestamp": false,
+  "pipe": false
 }
