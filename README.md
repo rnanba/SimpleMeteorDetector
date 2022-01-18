@@ -55,7 +55,7 @@ Python 3 と OpenCV が動く環境で動作します。
 
 動画の全フレームの比較明合成を行うためのコマンドです。
 
-```
+```sh
 python lighten_only_composite.py input_video_file output_image_file
 ```
 
@@ -70,7 +70,7 @@ python lighten_only_composite.py input_video_file output_image_file
 
 流星の写った画像を使って流星検出とマーク描画を試すためのコマンドです。
 
-```
+```sh
 python detector_tuner.py input_image_file
 ```
 
@@ -107,7 +107,7 @@ detector_tuner.py が正常に終了すると、コンソールに JSON 形式�
 
 ディレクトリにまとめた撮影画像、または撮影動画から流星を検出します。
 
-```
+```sh
 python detect_meteor.py input_directory_or_movie
 ```
 
@@ -145,7 +145,7 @@ detect_meteor.py が正常に終了すると、以下のファイルが生成さ
 
 detect_meteor.py の検出結果からダイジェスト動画を生成します。
 
-```
+```sh
 python make_digest_movie.py input_detection_result_file
 ```
 
@@ -189,7 +189,7 @@ mp4 ファイルのコーデックは現在一般的な h264 ではないため�
 
 `--pipe` オプションは以下のように使います。
 
-```
+```sh
 python make_digest_movie.py --pipe result_test.mov.json | ffmpeg -f rawvideo -pix_fmt bgr24 -s 1920x1080 -framerate 29.97 -i - -c:v libx264 -crf 17 test-h264.mp4
 
 ```
@@ -213,7 +213,7 @@ python make_digest_movie.py --pipe result_test.mov.json | ffmpeg -f rawvideo -pi
 
 以下は make_digest_movie.py の設定ファイルで、流星のクリップの前後を1秒に、マーカーを太さ1ピクセルの半透明の黄色に、タイムスタンプをデフォルトの1.5倍の半透明の白に指定した例です。
 
-```
+```json
 {
   "margin-before": 1.0,
   "margin-after": 1.0,
