@@ -103,7 +103,7 @@ detector_tuner.py が正常に終了すると、コンソールに JSON 形式�
 
 使用するカメラやレンズ、撮影条件等によって適切なパラメータは大きく変わります。detect_meteor.py で指定するパラメータ値を、このコマンドで先に調整することで、試行錯誤する時間を節約できます。
 
-## detect_meteor.py
+### detect_meteor.py
 
 ディレクトリにまとめた撮影画像、または撮影動画から流星を検出します。
 
@@ -141,7 +141,7 @@ detect_meteor.py が正常に終了すると、以下のファイルが生成さ
 
 設定ファイルの書式については「[設定ファイル](#設定ファイル)」の章を参照してください。
 
-## make_digest_movie.py
+### make_digest_movie.py
 
 detect_meteor.py の検出結果からダイジェスト動画を生成します。
 
@@ -185,7 +185,7 @@ mp4 ファイルのコーデックは現在一般的な h264 ではないため�
 
 設定ファイルの書式については「[設定ファイル](#設定ファイル)」の章を参照してください。
 
-### pipe モード
+#### pipe モード
 
 `--pipe` オプションは以下のように使います。
 
@@ -207,7 +207,7 @@ python make_digest_movie.py --pipe result_test.mov.json | ffmpeg -f rawvideo -pi
 |`-crf 17`                  | libx264 の品質レベル(constant rate factor)を指定しています。値は0から51が指定可能で、値が小さいほど高品質/低圧縮、大きいほど低品質/高圧縮で、0ならロスレスです。デフォルトは 22 です。|
 |`test-h264.mp4`            | 出力動画のファイル名です。|
 
-## 設定ファイル
+### 設定ファイル
 
 各コマンドの設定ファイルは JSON 形式で、それぞれのコマンドのコマンドラインオプションから先頭の `--` を削除したものを名前とし、オプションの値を値として記述します。ただし、フラグオプション(値を指定しないオプション)についてはオプションを有効にする場合は `true` オプションを無効にする場合は `false` を値として指定します。
 
@@ -229,9 +229,9 @@ python make_digest_movie.py --pipe result_test.mov.json | ffmpeg -f rawvideo -pi
 
 ## ライセンス
 
-本ソフトウェアのライセンス条件は [LICENCE](/LICENCE) を参照してください。
+本ソフトウェアのライセンス条件は [LICENSE](/LICENSE) を参照してください。
 
-本ソフトウェアは @tail-feather さんが公開している [detect_meteor.py](https://gist.github.com/tail-feather/d32d9ec125ba28c4a65b28fb74d7d00f)を改変したものです。detect_meteor.py のライセンス条件は以下の通りです。
+本ソフトウェアは @tail-feather さんが公開している [detect_meteor.py](https://gist.github.com/tail-feather/d32d9ec125ba28c4a65b28fb74d7d00f) を改変したものです。detect_meteor.py のライセンス条件は以下の通りです。
 
 ```
 BSD 3-Clause License
