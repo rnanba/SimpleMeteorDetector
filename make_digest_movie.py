@@ -14,6 +14,7 @@ import numpy as np
 import colorparse
 import rgbadraw
 import argutil
+import version
 
 args = None
 
@@ -167,7 +168,7 @@ def make_digest_movie(detection_result_file,
     cap.release()
 
 def main(argv):
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=version.version_string(__file__))
     parser.add_argument("detection_result_file", nargs='+')
     parser.add_argument("--margin-before", type=float, default=2.0)
     parser.add_argument("--margin-after", type=float, default=2.0)

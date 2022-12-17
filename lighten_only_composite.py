@@ -6,8 +6,10 @@ import sys
 import cv2
 import numpy
 
+import version
+
 def main(argv):
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=version.version_string(__file__))
     parser.add_argument("video_file")
     parser.add_argument("output_file")
     args = parser.parse_args(argv[1:])

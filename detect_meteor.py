@@ -18,6 +18,7 @@ from tqdm import tqdm
 import colorparse
 import rgbadraw
 import argutil
+import version
 
 args = None
 
@@ -318,7 +319,7 @@ def detect_from_dir_or_video(dir_or_video):
     print("detected: {}/{}".format(len(result), image_list.length()))
         
 def main(argv: typing.List[str]) -> int:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=version.version_string(__file__))
     parser.add_argument("directory_or_video", nargs='+')
     parser.add_argument("--area-threshold", type=float, default=0.0)
     parser.add_argument("--area-value-threshold", type=int, default=127)
@@ -335,6 +336,10 @@ def main(argv: typing.List[str]) -> int:
     parser.add_argument("--output-directory", default='.')
     global args
     args = parser.parse_args(argv[1:])
+
+    if args.version:
+        print_version()
+        exit
 
     if args.config_file:
         new_args = argutil.merge_config(parser, argv, args.config_file)

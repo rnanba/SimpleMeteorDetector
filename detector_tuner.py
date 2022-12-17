@@ -11,6 +11,7 @@ import typing
 import colorparse
 import rgbadraw
 import argutil
+import version
 
 T = typing.TypeVar("T")
 def clamp(v: T, min_v: T, max_v: T) -> T:
@@ -135,7 +136,7 @@ def draw_markers(src_img, lines, marker_color, marker_thickness):
     return rgbadraw.draw(dest_img, marker_color, draw)
 
 def main(argv):
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=version.version_string(__file__))
     parser.add_argument("image_file")
     parser.add_argument("--background-threshold", default='auto',
                         help="0-255 value or 'auto'.")
