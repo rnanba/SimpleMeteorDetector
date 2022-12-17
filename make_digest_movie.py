@@ -9,6 +9,7 @@ import dateutil.parser
 import json
 import ffmpeg
 import cv2
+import numpy as np
 
 import colorparse
 import rgbadraw
@@ -16,13 +17,28 @@ import argutil
 
 args = None
 
+ROT_TABLE = {
+    90: cv2.ROTATE_90_CLOCKWISE,
+    180: cv2.ROTATE_180,
+    270: cv2.ROTATE_90_COUNTERCLOCKWISE,
+    -90: cv2.ROTATE_90_COUNTERCLOCKWISE,
+}
+
+def make_lut(gamma):
+    lut = np.zeros((256, 1), dtype=np.uint8)
+    for i in range(256):
+        lut[i][0] = 255 * (float(i) / 255)**(1.0 / gamma)
+    return lut
+
 def parse_timedelta(time_str):
     h, m, s = map(float, time_str.split(":"))
     return datetime.timedelta(hours=h, minutes=m, seconds=s)
 
 def make_digest_movie(detection_result_file,
                       marker_color, marker_thickness,
-                      timestamp_color, timestamp_font_scale):
+                      timestamp_color, timestamp_font_scale, gamma, cue):
+    lut = make_lut(gamma)
+    cue_ms = int(cue * 1000)
     basename = os.path.basename(detection_result_file)
     output_filename = os.path.join(args.output_directory,
                                    os.path.splitext(basename)[0] + '.mp4')
@@ -100,11 +116,26 @@ def make_digest_movie(detection_result_file,
             ret, img = cap.read()
             if not ret:
                 break
+            
             timestamp = cap.get(cv2.CAP_PROP_POS_MSEC)
             time = datetime.timedelta(milliseconds=timestamp)
             if not rec and tl['start'] < time:
                 rec = True
+                cue_start = timestamp
             if rec:
+                if gamma is not 0:
+                    img = cv2.LUT(img, lut)
+                for d in detects:
+                    if str(time) == d['time']:
+                        def draw_marker(img, color):
+                            for line in d['lines']:
+                                x1, y1, x2, y2 = line[0]
+                                cv2.rectangle(img, (x1, y1), (x2, y2),
+                                              color, marker_thickness)
+                        if (marker_color):
+                            img = rgbadraw.draw(img, marker_color, draw_marker)
+                if args.rotation != 0:
+                    img = cv2.rotate(img, ROT_TABLE[args.rotation])
                 # タイムゾーンを考慮しないカメラ用の補正(JST固定)
                 ct_str = creation_time.replace('Z', '+09:00')
                 t = dateutil.parser.parse(ct_str) + time
@@ -117,17 +148,12 @@ def make_digest_movie(detection_result_file,
                                 fontFace=cv2.FONT_HERSHEY_COMPLEX,
                                 fontScale=timestamp_font_scale,
                                 color=color, lineType=cv2.LINE_AA)
+                    if cue_ms > 0 and (cue_start + cue_ms) > timestamp:
+                        cv2.line(img, pt1=(2,6+h), pt2=(2+w,6+h), color=color,
+                                 thickness=2, lineType=cv2.LINE_4)
+                        
                 if (timestamp_color):
                     img = rgbadraw.draw(img, timestamp_color, draw_timestamp)
-                for d in detects:
-                    if str(time) == d['time']:
-                        def draw_marker(img, color):
-                            for line in d['lines']:
-                                x1, y1, x2, y2 = line[0]
-                                cv2.rectangle(img, (x1, y1), (x2, y2),
-                                              color, marker_thickness)
-                        if (marker_color):
-                            img = rgbadraw.draw(img, marker_color, draw_marker)
                 if args.pipe:
                     sys.stdout.buffer.write(img.tobytes())
                 else:
@@ -146,16 +172,19 @@ def main(argv):
     parser.add_argument("--margin-before", type=float, default=2.0)
     parser.add_argument("--margin-after", type=float, default=2.0)
     parser.add_argument("--marker-color", default="(0,255,0)",
-                        help="'(R,G,B)' or '(R,G,B,A)' format.")
+                        help="'(B,G,R)' or '(B,G,R,A)' format.")
     parser.add_argument("--marker-thickness", type=int, default=1)
     parser.add_argument("--timestamp-color", default="(160,160,160)",
-                        help="'(R,G,B)' or '(R,G,B,A)' format.")
+                        help="'(B,G,R)' or '(B,G,R,A)' format.")
     parser.add_argument("--timestamp-font-scale", type=float, default=1.0)
     parser.add_argument("--disable-marker", action="store_true")
     parser.add_argument("--disable-timestamp", action="store_true")
     parser.add_argument("--config-file", default=None)
     parser.add_argument("--output-directory", default='.')
     parser.add_argument("--pipe", action="store_true")
+    parser.add_argument("--gamma", type=float, default='1')
+    parser.add_argument("--cue", type=float, default=0)
+    parser.add_argument("--rotation", type=int, default=0)
     global args
     args = parser.parse_args(argv[1:])
 
@@ -190,10 +219,16 @@ def main(argv):
             print("ERROR: " + err.message, file=sys.stderr)
             return -1
 
+    if not (args.rotation == 0 or args.rotation == 90 or
+            args.rotation == 180 or args.rotation == 270 or args.rotation == -90):
+            print("ERROR: invalid --rotation arg: specify 0 or 90 or 180 or 270 or -90.")
+            return -1
+
     for detection_result_file in args.detection_result_file:
         make_digest_movie(detection_result_file,
                           marker_color, args.marker_thickness,
-                          timestamp_color, args.timestamp_font_scale)
+                          timestamp_color, args.timestamp_font_scale,
+                          args.gamma, args.cue)
 
     return 0
 
