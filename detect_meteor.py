@@ -31,7 +31,6 @@ def load_gray(filepath: str) -> numpy.array:
     img = cv2.imread(filepath, cv2.IMREAD_GRAYSCALE)
     return img
 
-
 def detect_lines(img: numpy.array) -> typing.List[numpy.array]:
     """
     直線検出
@@ -39,23 +38,27 @@ def detect_lines(img: numpy.array) -> typing.List[numpy.array]:
     :return: 検出直線リスト, 輪郭画像
     """
     ret, thr = cv2.threshold(img, args.background_threshold, 255,
-                             cv2.ADAPTIVE_THRESH_MEAN_C)
-    lines = cv2.HoughLinesP(thr, rho=1, theta=math.pi/180, threshold=0,
+                           cv2.ADAPTIVE_THRESH_MEAN_C)
+    lines = cv2.HoughLinesP(thr, rho=1, theta=math.pi/180,
+                            threshold=args.hough_threshold,
                             minLineLength=args.min_line_length,
                             maxLineGap=args.max_line_gap)
     return lines, thr
 
 
-def detect_area(img: numpy.array, threshold: float = 0.0001) -> typing.List[numpy.array]:
+def detect_area(img: numpy.array, threshold: float = 0.0001,
+                value_threshold: int = 127) -> typing.List[numpy.array]:
     """
     閾値を超える面積を持つ輪郭の検出
     :param numpy.array img: 入力画像
     :param float threshold: 閾値（画像全体の何%を`(0, 1]`で指定）
+    :param int value_threshold: ピクセル値の閾値を `(0-255)`で指定）
     :return: 閾値を超えた面積の領域リスト
     """
     height, width = img.shape
     img_area = width * height
-    ret, thr = cv2.threshold(img, 127, 255, cv2.ADAPTIVE_THRESH_MEAN_C)
+    ret, thr = cv2.threshold(img, value_threshold, 255,
+                             cv2.ADAPTIVE_THRESH_MEAN_C)
     _, contours, hierarchy = cv2.findContours(thr, 1, 2)
     contours = [cnt for cnt in contours if (cv2.contourArea(cnt) / img_area) > threshold]
     return contours
@@ -120,16 +123,19 @@ def line_length(line: numpy.array) -> float:
     return math.sqrt(dx * dx + dy * dy)
 
 
-def detect_meteor(img: numpy.array, area_threshold: float, line_threshold: float) -> typing.Optional[typing.Tuple[str, typing.List[numpy.array]]]:
+def detect_meteor(img: numpy.array, area_threshold: float,
+                  area_value_threshold: int,
+                  line_threshold: float) -> typing.Optional[typing.Tuple[str, typing.List[numpy.array]]]:
     """
     流星の検出
     :param numpy.array img: 入力画像
     :param float area_threshold: 面積のある領域検知用閾値（`detect_area()`関数`threshold`参照）
+    :param int area_value_threshold: ピクセル値の閾値を `(0-255)`で指定）
     :param float line_threshold: 検出した直線を流星と判定する最小の長さ
     :return: (画像ファイルパス, 検出した直線) or None, 輪郭画像 or None
     """
     if area_threshold > 0.0:
-        area_contours = detect_area(img, area_threshold)
+        area_contours = detect_area(img, area_threshold, area_value_threshold)
         if area_contours:
             img = fill_area(img, area_contours)
     lines, timg = detect_lines(img)
@@ -282,7 +288,9 @@ def detect_from_dir_or_video(dir_or_video):
     
     result = []
     for i, image in enumerate(tqdm(image_list)):
-        lines, timg = detect_meteor(image, args.area_threshold, args.line_threshold)
+        lines, timg = detect_meteor(image, args.area_threshold,
+                                    args.area_value_threshold,
+                                    args.line_threshold)
         if lines is not None:
             entry = {}
             entry['file'] = path = image_list.filepath(i)
@@ -313,9 +321,11 @@ def main(argv: typing.List[str]) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("directory_or_video", nargs='+')
     parser.add_argument("--area-threshold", type=float, default=0.0)
+    parser.add_argument("--area-value-threshold", type=int, default=127)
     parser.add_argument("--line-threshold", type=float, default=21)
     parser.add_argument("--min-line-length", type=float, default=21)
     parser.add_argument("--max-line-gap", type=float, default=5)
+    parser.add_argument("--hough-threshold", type=int, default=0)
     parser.add_argument("--background-threshold", type=int, default=25)
     parser.add_argument("--stack-frames", type=int, default=5)
     parser.add_argument("--marker-color", default="(0,255,0)",
