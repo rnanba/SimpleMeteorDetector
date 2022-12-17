@@ -330,7 +330,7 @@ def main(argv: typing.List[str]) -> int:
     parser.add_argument("--background-threshold", type=int, default=25)
     parser.add_argument("--stack-frames", type=int, default=5)
     parser.add_argument("--marker-color", default="(0,255,0)",
-                        help="'(R,G,B)' or '(R,G,B,A)' format.")
+                        help="'(B,G,R)' or '(B,G,R,A)' format.")
     parser.add_argument("--marker-thickness", type=int, default=1)
     parser.add_argument("--config-file", default=None)
     parser.add_argument("--output-directory", default='.')

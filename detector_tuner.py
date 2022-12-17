@@ -146,7 +146,7 @@ def main(argv):
     parser.add_argument("--max-line-gap", type=float, default=6)
     parser.add_argument("--hough-threshold", type=int, default=0)
     parser.add_argument("--marker-color", default="(0,255,0)",
-                        help="'(R,G,B)' or '(R,G,B,A)' format.")
+                        help="'(B,G,R)' or '(B,G,R,A)' format.")
     parser.add_argument("--marker-thickness", type=int, default=1)
     parser.add_argument("--input-config-file", default=None)
     parser.add_argument("--output-config-file", default=None)
